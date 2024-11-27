@@ -1,0 +1,40 @@
+# Build stage
+FROM node:18-alpine AS build
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Clean install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Set environment variable for React app
+ENV REACT_APP_API_URL=https://servitec-backend-62676166363.europe-southwest1.run.app
+
+# Build the app
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built app
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copy nginx configurations
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+# Create required directories and set permissions
+RUN mkdir -p /var/cache/nginx && \
+    mkdir -p /var/log/nginx && \
+    touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/cache/nginx /var/log/nginx /var/run/nginx.pid /etc/nginx/conf.d
+# Set environment variables
+ENV PORT=8080
+EXPOSE 8080
+
+# Test nginx configuration and start
+CMD nginx -t && nginx -g 'daemon off;'

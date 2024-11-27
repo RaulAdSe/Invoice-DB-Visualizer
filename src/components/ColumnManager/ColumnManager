@@ -1,0 +1,98 @@
+import React, { useState, useRef } from 'react';
+import {
+  Box,
+  Paper,
+  Popper,
+  IconButton,
+  Checkbox,
+  FormControlLabel,
+  Typography,
+  ClickAwayListener
+} from '@mui/material';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+
+const ColumnManager = ({ columns, visibleColumns, onColumnsChange }) => {
+  const [open, setOpen] = useState(false);
+  const anchorRef = useRef(null);
+
+  const handleToggle = () => {
+    setOpen((prevOpen) => !prevOpen);
+  };
+
+  const handleClose = (event) => {
+    if (anchorRef.current && anchorRef.current.contains(event.target)) {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const handleColumnToggle = (field) => {
+    const newVisibleColumns = visibleColumns.includes(field)
+      ? visibleColumns.filter(col => col !== field)
+      : [...visibleColumns, field];
+    onColumnsChange(newVisibleColumns);
+  };
+
+  return (
+    <Box sx={{ position: 'relative', zIndex: 1000 }}>
+      <IconButton
+        ref={anchorRef}
+        onClick={handleToggle}
+        size="small"
+        sx={{ 
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          '&:hover': { bgcolor: 'action.hover' }
+        }}
+      >
+        <ViewColumnIcon />
+      </IconButton>
+      
+      <Popper
+        open={open}
+        anchorEl={anchorRef.current}
+        placement="bottom-end"
+        sx={{ zIndex: 1000 }}
+      >
+        <ClickAwayListener onClickAway={handleClose}>
+          <Paper 
+            sx={{ 
+              p: 2, 
+              maxHeight: '400px', 
+              overflow: 'auto',
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: 3
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>
+              Toggle Columns
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              {columns.map((column) => (
+                <FormControlLabel
+                  key={column.field}
+                  control={
+                    <Checkbox
+                      checked={visibleColumns.includes(column.field)}
+                      onChange={() => handleColumnToggle(column.field)}
+                      size="small"
+                    />
+                  }
+                  label={
+                    <Typography variant="body2">
+                      {column.headerName}
+                    </Typography>
+                  }
+                />
+              ))}
+            </Box>
+          </Paper>
+        </ClickAwayListener>
+      </Popper>
+    </Box>
+  );
+};
+
+export default ColumnManager;
