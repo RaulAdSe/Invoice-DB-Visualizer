@@ -1407,6 +1407,19 @@ def download_selected(entity_type):
                 'border': 1,
                 'align': 'right'
             })
+            
+            highlighted_cell_format = workbook.add_format({
+                'bg_color': '#FFE5CC',  # Light orange color
+                'align': 'left'
+            })
+
+            
+            highlighted_number_format = workbook.add_format({
+                'bg_color': '#FFE5CC',  # Light orange color
+                'num_format': '#,##0.00',
+                'align': 'right'
+            })
+
 
             if entity_type == 'elements':
                 worksheet = workbook.add_worksheet('Elements')
@@ -1425,25 +1438,31 @@ def download_selected(entity_type):
                 for col, header in enumerate(all_columns):
                     worksheet.write(current_row, col, header, header_format)
 
+
                 current_row = 1
                 for _, row in df.iterrows():
-                    # Write element data
+                    # Write element data with conditional formatting
                     for col, value in enumerate(row.values[1:]):
-                        if isinstance(value, (int, float)):
-                            worksheet.write_number(current_row, col, value, number_format)
+                        header = element_columns[col]
+                        if header in ['name', 'price_per_unit', 'invoice_name']:
+                            if isinstance(value, (int, float)):
+                                worksheet.write_number(current_row, col, value, highlighted_number_format)
+                            else:
+                                worksheet.write(current_row, col, value, highlighted_cell_format)
                         else:
-                            worksheet.write(current_row, col, value)
+                            if isinstance(value, (int, float)):
+                                worksheet.write_number(current_row, col, value, number_format)
+                            else:
+                                worksheet.write(current_row, col, value)
                     
                     # Add subelements if they exist
                     element_subs = subelements_df[subelements_df['element_id'] == row.iloc[0]]
                     if not element_subs.empty:
                         for _, sub_row in element_subs.iterrows():
                             current_row += 1
-                            # Clear element columns for subelement row
                             for col in range(len(element_columns)):
                                 worksheet.write(current_row, col, '')
                             
-                            # Write subelement data without the "Subelement X:" prefix
                             col_offset = len(element_columns)
                             worksheet.write(current_row, col_offset, sub_row['title'])
                             worksheet.write(current_row, col_offset + 1, sub_row['unit'])
@@ -1459,15 +1478,12 @@ def download_selected(entity_type):
             else:
                 worksheet = workbook.add_worksheet('Data')
                 
-                # Set consistent column width for all columns
                 for col in range(len(df.columns)):
-                    worksheet.set_column(col, col, 15)  # Set default width to 15
+                    worksheet.set_column(col, col, 15)
 
-                # Write headers
                 for col, header in enumerate(df.columns):
                     worksheet.write(0, col, header, header_format)
 
-                # Write data
                 for row_idx, row in df.iterrows():
                     for col_idx, value in enumerate(row):
                         if isinstance(value, (int, float)):
@@ -1475,7 +1491,6 @@ def download_selected(entity_type):
                         else:
                             worksheet.write(row_idx + 1, col_idx, value)
 
-            # Add common Excel features
             worksheet.freeze_panes(1, 0)
             worksheet.autofilter(0, 0, len(df), len(df.columns) - 1)
 
