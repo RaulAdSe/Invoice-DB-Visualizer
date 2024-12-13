@@ -319,6 +319,7 @@ function App() {
               <TableCell align="right">Length (L)</TableCell>
               <TableCell align="right">Height (H)</TableCell>
               <TableCell align="right">Width (W)</TableCell>
+              <TableCell align="right">Unit Price</TableCell>
               <TableCell align="right">Total Price</TableCell>
             </TableRow>
           </TableHead>

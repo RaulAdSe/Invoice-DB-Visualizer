@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set variables
-PROJECT_ID="utopian-honor-438919-b9"
+PROJECT_ID="deep-responder-444017-h2"
 REGION="europe-southwest1"
 REPOSITORY="invoiceapp"
 REGISTRY="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPOSITORY}"
@@ -18,10 +18,10 @@ echo "Cleaning up existing containers..."
 docker stop $(docker ps -a -q) 2>/dev/null || true
 docker rm $(docker ps -a -q) 2>/dev/null || true
 
-# Build the images with no-cache
 echo "Building Docker images..."
-docker build --no-cache -t servitec-db-app-frontend:latest -f Dockerfile.frontend .
-docker build --no-cache -t servitec-db-app-backend:latest -f Dockerfile.backend .
+# Build the images with no-cache and platform specification
+docker build --no-cache --platform linux/amd64 -t servitec-db-app-frontend:latest -f Dockerfile.frontend .
+docker build --no-cache --platform linux/amd64 -t servitec-db-app-backend:latest -f Dockerfile.backend .
 
 # Tag the images
 echo "Tagging Docker images..."

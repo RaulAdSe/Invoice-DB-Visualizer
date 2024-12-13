@@ -256,7 +256,7 @@ def login():
         if is_rate_limited(client_ip):
             # Record failed login attempt due to rate limiting
             event = LoginEvent(
-                username=request.json.get('username', 'unknown'),
+                username=request.json.get('username', ''),
                 ip_address=client_ip,
                 success=False
             )
@@ -277,7 +277,7 @@ def login():
         if not auth or not auth.get('username') or not auth.get('password'):
             # Record failed login attempt due to missing credentials
             event = LoginEvent(
-                username=auth.get('username', 'unknown') if auth else 'unknown',
+                username=auth.get('username', '') if auth else '',
                 ip_address=client_ip,
                 success=False
             )
@@ -355,7 +355,7 @@ def login():
         # Record failed login attempt due to error
         try:
             event = LoginEvent(
-                username=request.json.get('username', 'unknown') if request.json else 'unknown',
+                username=request.json.get('username', '') if request.json else '',
                 ip_address=client_ip,
                 success=False
             )
@@ -495,7 +495,7 @@ def connect_to_db():
             host = f'/cloudsql/{instance_connection_name}'
         else:
             print("Running locally, using TCP connection")
-            host = os.getenv('DB_HOST', '34.175.125.26')
+            host = os.getenv('DB_HOST', '34.175.111.125 ')
 
         print(f"Connecting with: host={host}, db={db_name}, user={db_user}")
         
@@ -549,8 +549,8 @@ def test_db_connection():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.settimeout(5)
         
-        print(f"Testing TCP connection to {os.getenv('DB_HOST', '34.175.125.26')}:5432")
-        result = s.connect_ex((os.getenv('DB_HOST', '34.175.125.26'), 5432))
+        print(f"Testing TCP connection to {os.getenv('DB_HOST', '34.175.111.125 ')}:5432")
+        result = s.connect_ex((os.getenv('DB_HOST', '34.175.111.125 '), 5432))
         if result == 0:
             print("TCP Connection: SUCCESS")
         else:
@@ -559,7 +559,7 @@ def test_db_connection():
         
         # Now test PostgreSQL connection
         print("\nTesting PostgreSQL connection...")
-        print(f"DB_HOST: {os.getenv('DB_HOST', '34.175.125.26')}")
+        print(f"DB_HOST: {os.getenv('DB_HOST', '34.175.111.125 ')}")
         print(f"DB_NAME: {os.getenv('DB_NAME', 'ServitecInvoiceData')}")
         print(f"DB_USER: {os.getenv('DB_USER', 'postgres')}")
         
@@ -583,7 +583,7 @@ def test_db_connection():
                 'connection': 'successful',
                 'version': version[0] if version else None,
                 'projects_count': count[0] if count else 0,
-                'host': os.getenv('DB_HOST', '34.175.125.26'),
+                'host': os.getenv('DB_HOST', '34.175.111.125 '),
                 'database': os.getenv('DB_NAME', 'ServitecInvoiceData'),
                 'user': os.getenv('DB_USER', 'postgres')
             }
@@ -595,7 +595,7 @@ def test_db_connection():
             'status': 'error',
             'message': str(e),
             'database': {
-                'host': os.getenv('DB_HOST', '34.175.125.26'),
+                'host': os.getenv('DB_HOST', '34.175.111.125 '),
                 'database': os.getenv('DB_NAME', 'ServitecInvoiceData'),
                 'user': os.getenv('DB_USER', 'postgres')
             }
@@ -626,7 +626,7 @@ def health_check():
             "status": "healthy",
             "database": {
                 "connected": True,
-                "version": version[0] if version else "unknown"
+                "version": version[0] if version else ""
             },
             "timestamp": pd.Timestamp.now().isoformat()
         }), 200
@@ -1336,6 +1336,7 @@ def download_selected(entity_type):
                     s.l,
                     s.h,
                     s.w,
+                    s.unit_price,
                     s.total_price
                 FROM subelements s
                 WHERE s.element_id = ANY(%s::integer[])
@@ -1427,12 +1428,12 @@ def download_selected(entity_type):
 
                 element_columns = list(df.columns)
                 element_columns = element_columns[1:]  # Skip the id column
-                subelement_columns = ['Sub Title', 'Sub Unit', 'N', 'L', 'H', 'W', 'Sub Total Price']
+                subelement_columns = ['Sub Title', 'Sub Unit', 'N', 'L', 'H', 'W', 'Sub Unit Price', 'Sub Total Price']
                 all_columns = element_columns + subelement_columns
                 
                 # Set consistent column width for all columns
                 for col in range(len(all_columns)):
-                    worksheet.set_column(col, col, 18)  # Set default width to 15
+                    worksheet.set_column(col, col, 19)  # Set default width to 15, VERY IMPORTANT
 
                 # Write headers
                 for col, header in enumerate(all_columns):
@@ -1470,8 +1471,10 @@ def download_selected(entity_type):
                             if sub_row['l']: worksheet.write_number(current_row, col_offset + 3, sub_row['l'], number_format)
                             if sub_row['h']: worksheet.write_number(current_row, col_offset + 4, sub_row['h'], number_format)
                             if sub_row['w']: worksheet.write_number(current_row, col_offset + 5, sub_row['w'], number_format)
+                            if sub_row['unit_price']:
+                                worksheet.write_number(current_row, col_offset + 6, sub_row['unit_price'], number_format)
                             if sub_row['total_price']: 
-                                worksheet.write_number(current_row, col_offset + 6, sub_row['total_price'], number_format)
+                                worksheet.write_number(current_row, col_offset + 7, sub_row['total_price'], number_format)
                     
                     current_row += 1
                     
@@ -1479,7 +1482,7 @@ def download_selected(entity_type):
                 worksheet = workbook.add_worksheet('Data')
                 
                 for col in range(len(df.columns)):
-                    worksheet.set_column(col, col, 15)
+                    worksheet.set_column(col, col, 19)
 
                 for col, header in enumerate(df.columns):
                     worksheet.write(0, col, header, header_format)

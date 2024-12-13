@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: europe-southwest1-docker.pkg.dev/utopian-honor-438919-b9/invoiceapp/servitec-frontend:latest
+    image: europe-southwest1-docker.pkg.dev/deep-responder-444017-h2/invoiceapp/servitec-frontend:latest
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -15,19 +15,19 @@ services:
       timeout: 5s
       retries: 5
   backend:
-    image: europe-southwest1-docker.pkg.dev/utopian-honor-438919-b9/invoiceapp/servitec-backend:latest
+    image: europe-southwest1-docker.pkg.dev/deep-responder-444017-h2/invoiceapp/servitec-backend:latest
     build:
       context: .
       dockerfile: Dockerfile.backend
     environment:
       - FLASK_APP=server.py
       - FLASK_ENV=production
-      - DB_HOST=34.175.125.26
+      - DB_HOST=34.175.111.125 
       - DB_PORT=5432
       - DB_NAME=ServitecInvoiceData
       - DB_USER=postgres
       - DB_PASSWORD=${DB_PASSWORD}
-      - INSTANCE_CONNECTION_NAME=utopian-honor-438919-b9:europe-southwest1:servitec-invoices
+      - INSTANCE_CONNECTION_NAME=deep-responder-444017-h2:europe-southwest1:servitec-invoices
       - PORT=8080
       - VPN_SUBNET=${VPN_SUBNET}
     ports:

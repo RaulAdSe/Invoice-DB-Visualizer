@@ -38,7 +38,7 @@ const Login = () => {
         login(response.data);
         localStorage.setItem('token', response.data.token); // Ensure token is stored
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-        navigate('/admin');
+        navigate('/');
       } else {
         setError('Invalid response from server');
       }

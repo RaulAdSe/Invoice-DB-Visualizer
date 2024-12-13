@@ -49,6 +49,7 @@ const SubelementsList = ({ elementId }) => {
             <TableCell align="right">L</TableCell>
             <TableCell align="right">H</TableCell>
             <TableCell align="right">W</TableCell>
+            <TableCell align="right">Unit Price</TableCell>
             <TableCell align="right">Total Price</TableCell>
           </TableRow>
         </TableHead>
