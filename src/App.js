@@ -13,7 +13,7 @@ import Login from './components/Login/Login';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AdminPanel from './components/AdminPanel/AdminPanel';
 
-axios.defaults.baseURL = 'https://servitec-backend-62676166363.europe-southwest1.run.app';
+axios.defaults.baseURL = 'https://servitec-backend-77413952899.europe-southwest1.run.app';
 
 // Add request interceptor
 axios.interceptors.request.use(

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Since we're using Cloud Run, we should use the direct backend URL
-const API_BASE_URL = 'https://servitec-backend-62676166363.europe-southwest1.run.app';
+const API_BASE_URL = 'https://servitec-backend-77413952899.europe-southwest1.run.app';
 
 console.log('API Service: Initializing with base URL:', API_BASE_URL);
 

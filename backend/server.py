@@ -13,6 +13,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from flask_session import Session
 import sys
+import httpx
 
 import jwt
 from datetime import datetime, timedelta
@@ -54,7 +55,6 @@ CORS(app,
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 env_path = os.path.join(parent_dir, '.env')
 load_dotenv(env_path)
-openai.api_key = os.getenv('OPENAI_API_KEY')
 
 TRUSTED_PROXIES = os.getenv('VPN_SUBNET')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -63,8 +63,16 @@ Session(app)
 
 
 # Initialize OpenAI client
-client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-
+try:
+    # Fixed version
+    client = OpenAI(
+        api_key=os.getenv('OPENAI_API_KEY'),
+        base_url="https://api.openai.com/v1",
+        http_client=httpx.Client()  # Explicitly create the HTTP client without proxies
+    )
+except Exception as e:
+    print(f"Warning: OpenAI client initialization failed: {e}")
+    client = None
 
 # Make sure you have the USERS list and SECRET_KEY defined
 USERS = [
@@ -486,7 +494,7 @@ def connect_to_db():
         instance_connection_name = os.getenv('INSTANCE_CONNECTION_NAME')
         db_user = os.getenv('DB_USER', 'postgres')
         db_pass = os.getenv('DB_PASSWORD')
-        db_name = os.getenv('DB_NAME', 'ServitecInvoiceData')
+        db_name = os.getenv('DB_NAME', 'ServitecInvoiceDataBase')
 
         # Check if running on Cloud Run
         if os.getenv('K_SERVICE'):
@@ -495,7 +503,7 @@ def connect_to_db():
             host = f'/cloudsql/{instance_connection_name}'
         else:
             print("Running locally, using TCP connection")
-            host = os.getenv('DB_HOST', '34.175.111.125 ')
+            host = os.getenv('DB_HOST', '34.175.111.125')
 
         print(f"Connecting with: host={host}, db={db_name}, user={db_user}")
         
@@ -560,7 +568,7 @@ def test_db_connection():
         # Now test PostgreSQL connection
         print("\nTesting PostgreSQL connection...")
         print(f"DB_HOST: {os.getenv('DB_HOST', '34.175.111.125 ')}")
-        print(f"DB_NAME: {os.getenv('DB_NAME', 'ServitecInvoiceData')}")
+        print(f"DB_NAME: {os.getenv('DB_NAME', 'ServitecInvoiceDataBase')}")
         print(f"DB_USER: {os.getenv('DB_USER', 'postgres')}")
         
         conn = connect_to_db()
@@ -584,7 +592,7 @@ def test_db_connection():
                 'version': version[0] if version else None,
                 'projects_count': count[0] if count else 0,
                 'host': os.getenv('DB_HOST', '34.175.111.125 '),
-                'database': os.getenv('DB_NAME', 'ServitecInvoiceData'),
+                'database': os.getenv('DB_NAME', 'ServitecInvoiceDataBase'),
                 'user': os.getenv('DB_USER', 'postgres')
             }
         })
@@ -596,7 +604,7 @@ def test_db_connection():
             'message': str(e),
             'database': {
                 'host': os.getenv('DB_HOST', '34.175.111.125 '),
-                'database': os.getenv('DB_NAME', 'ServitecInvoiceData'),
+                'database': os.getenv('DB_NAME', 'ServitecInvoiceDataBase'),
                 'user': os.getenv('DB_USER', 'postgres')
             }
         }), 500
