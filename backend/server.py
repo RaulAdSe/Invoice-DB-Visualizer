@@ -1453,7 +1453,7 @@ def download_selected(entity_type):
                     # Write element data with conditional formatting
                     for col, value in enumerate(row.values[1:]):
                         header = element_columns[col]
-                        if header in ['name', 'price_per_unit', 'invoice_name']:
+                        if header in ['name', 'price_per_unit', 'invoice_name','Sub Unit Price']:
                             if isinstance(value, (int, float)):
                                 worksheet.write_number(current_row, col, value, highlighted_number_format)
                             else:
