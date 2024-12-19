@@ -1,5 +1,7 @@
 # Invoice Management System
 
+![Invoice Management App Interface](Screenshot%202024-12-19%20at%2012.47.05.svg)
+
 A full-stack application for managing invoices, elements, and projects with advanced filtering, reporting, and chat capabilities. Built with React and Flask, deployable to Google Cloud Platform.
 
 ## Features
