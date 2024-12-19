@@ -28,7 +28,7 @@ A full-stack application for managing invoices, elements, and projects with adva
 - PostgreSQL
 - OpenAI integration
 - JWT authentication
-- SQLAlchemy
+- Psycopg2
 
 ### Infrastructure
 - Docker & Docker Compose
