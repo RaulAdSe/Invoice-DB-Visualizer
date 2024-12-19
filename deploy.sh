@@ -48,4 +48,3 @@ gcloud run deploy servitec-backend \
   --allow-unauthenticated \
   --add-cloudsql-instances=${PROJECT_ID}:${REGION}:servitec-invoices \
   --set-env-vars=INSTANCE_CONNECTION_NAME=${PROJECT_ID}:${REGION}:servitec-invoices
-  #,DB_HOST=34.175.111.125,DB_NAME=ServitecInvoiceDataBase,DB_USER=postgres,DB_PASSWORD=H6o$-Tt6U@>oBIfU

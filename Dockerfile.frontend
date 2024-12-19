@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Set environment variable for React app
-ENV REACT_APP_API_URL=https://servitec-backend-77413952899.europe-southwest1.run.app
+ENV REACT_APP_API_URL=${BACKEND_URL}
 
 # Build the app
 RUN npm run build
